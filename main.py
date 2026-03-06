@@ -4,6 +4,7 @@ import sys
 import json
 from src.utils.screen import find_game_region
 from src.bot.herblore import HerbloreBot
+from src.utils.logger import log_info, log_error, log_debug
 
 
 def print_banner():
