@@ -1,0 +1,81 @@
+{
+  "potions": [
+    {
+      "name": "Attack potion",
+      "herb": "Guam leaf",
+      "secondary": "Eye of newt",
+      "level": 3,
+      "xp": 25
+    },
+    {
+      "name": "Antipoison",
+      "herb": "Marrentill",
+      "secondary": "Unicorn horn dust",
+      "level": 5,
+      "xp": 37.5
+    },
+    {
+      "name": "Strength potion",
+      "herb": "Tarromin",
+      "secondary": "Limpwurt root",
+      "level": 12,
+      "xp": 50
+    },
+    {
+      "name": "Restore potion",
+      "herb": "Harralander",
+      "secondary": "Red spiders' eggs",
+      "level": 22,
+      "xp": 62.5
+    },
+    {
+      "name": "Prayer potion",
+      "herb": "Ranarr weed",
+      "secondary": "Snape grass",
+      "level": 38,
+      "xp": 87.5
+    },
+    {
+      "name": "Super attack",
+      "herb": "Irit leaf",
+      "secondary": "Eye of newt",
+      "level": 45,
+      "xp": 100
+    },
+    {
+      "name": "Super strength",
+      "herb": "Kwuarm",
+      "secondary": "Limpwurt root",
+      "level": 55,
+      "xp": 125
+    },
+    {
+      "name": "Super restore",
+      "herb": "Snapdragon",
+      "secondary": "Red spiders' eggs",
+      "level": 63,
+      "xp": 142.5
+    },
+    {
+      "name": "Super defence",
+      "herb": "Cadantine",
+      "secondary": "White berries",
+      "level": 66,
+      "xp": 150
+    },
+    {
+      "name": "Ranging potion",
+      "herb": "Dwarf weed",
+      "secondary": "Wine of zamorak",
+      "level": 72,
+      "xp": 162.5
+    },
+    {
+      "name": "Saradomin brew",
+      "herb": "Toadflax",
+      "secondary": "Crushed nest",
+      "level": 81,
+      "xp": 180
+    }
+  ]
+}
