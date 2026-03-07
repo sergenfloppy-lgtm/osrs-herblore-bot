@@ -240,11 +240,18 @@ Or double-click `START.bat` on Windows.
 1. Select potion
 2. Press Enter to start recording
 3. Just click each item:
+   BANKING PHASE:
    - Bank booth
    - Deposit button
-   - Herb in bank
-   - Secondary in bank
+   - Herb in bank (e.g., Guam leaf)
+   - Secondary in bank (e.g., Eye of newt)
    - First inventory slot
+   
+   POTION-MAKING PHASE:
+   - Withdraw 14 herbs + 14 secondaries
+   - Click herb in inventory (where it appears)
+   - Click secondary in inventory (where it appears)
+   
 4. Done! No Enter between steps!
 
 ✅ Setup complete!
@@ -395,6 +402,35 @@ mouse_listener.start()
 - Faster setup
 - Real-time capture
 
+### Why Record Inventory Positions?
+
+**Old Method (v3 and earlier):**
+```python
+# Bot guessed positions
+herb_slot = inventory_slots[0]   # Assumed slot 0
+secondary_slot = inventory_slots[14]  # Assumed slot 14
+```
+
+**Problems:**
+- Items might not be in slots 0 and 14
+- Bank organization varies per player
+- No guarantee which item appears where
+- Failed clicks if wrong slots
+
+**New Method (v4):**
+```python
+# Bot uses YOUR recorded positions
+herb_slot = recorded_herb_inv_position
+secondary_slot = recorded_secondary_inv_position
+```
+
+**Benefits:**
+- ✅ Bot clicks exactly what you recorded
+- ✅ Works with any bank organization
+- ✅ No assumptions about inventory layout
+- ✅ More reliable potion making
+- ✅ You control which items get clicked
+
 ### Recording Session Example
 
 ```
@@ -407,29 +443,64 @@ mouse_listener.start()
 👉 Press Enter to start recording...
 
 ============================================================
-📍 FIRST STEP: BANK
+📍 STEP 1: BANK
 ============================================================
 🏦 Click the bank booth/chest to record its position.
 
   📍 Captured: bank at (1127, 384)
 
 ============================================================
-📍 NEXT: DEPOSIT
+📍 STEP 2: DEPOSIT
 ============================================================
 📤 Open the bank, then click "Deposit Inventory" button.
 
   📍 Captured: deposit at (1456, 782)
 
 ============================================================
-📍 NEXT: HERB
+📍 STEP 3: HERB IN BANK
 ============================================================
 🌿 Click 'Guam leaf' in your bank.
 
   📍 Captured: herb at (1234, 567)
 
-[... continues automatically ...]
+============================================================
+📍 STEP 4: SECONDARY IN BANK
+============================================================
+🧪 Click 'Eye of newt' in your bank.
+
+  📍 Captured: secondary at (1345, 678)
+
+============================================================
+📍 STEP 5: FIRST INVENTORY SLOT
+============================================================
+📦 Close bank, then click the first inventory slot (top-left).
+
+  📍 Captured: inv_first at (1567, 234)
+
+✅ Calculated 28 inventory slots
+
+============================================================
+📍 STEP 6: HERB IN INVENTORY (NEW!)
+============================================================
+🌿 [POTION MAKING] Withdraw 14 Guam leaf + 14 Eye of newt,
+then click the HERB in your inventory (where it appears).
+
+  📍 Captured: herb_inv at (1567, 234)
+
+============================================================
+📍 STEP 7: SECONDARY IN INVENTORY (NEW!)
+============================================================
+🧪 [POTION MAKING] Now click the Eye of newt in your
+inventory (where it appears).
+
+  📍 Captured: secondary_inv at (1609, 234)
 
 ✅ Recording complete!
+
+📊 VISUAL OVERLAY
+============================================================
+Showing click variance zones...
+✅ Overlay saved to: overlay_preview.png
 ```
 
 ---
