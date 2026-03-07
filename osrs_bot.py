@@ -80,10 +80,14 @@ class Setup:
         region = {'left': x - 30, 'top': y - 30, 'width': 60, 'height': 60}
         screenshot = np.array(self.sct.grab(region))
         
+        # Convert BGRA to BGR
+        if screenshot.shape[2] == 4:
+            screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGRA2BGR)
+        
         self.templates[name] = screenshot
         self.positions[name] = (x, y)
         
-        # Save template
+        # Save template (screenshot already converted to BGR above)
         Path('templates').mkdir(exist_ok=True)
         img = Image.fromarray(cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB))
         img.save(f'templates/{name}.png')
@@ -210,6 +214,12 @@ class Validator:
         # Compare with template
         template = self.setup.templates[item_name]
         
+        # Convert BGRA to BGR if needed
+        if screenshot.shape[2] == 4:
+            screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGRA2BGR)
+        if template.shape[2] == 4:
+            template = cv2.cvtColor(template, cv2.COLOR_BGRA2BGR)
+        
         # Ensure same size
         if screenshot.shape != template.shape:
             template = cv2.resize(template, (screenshot.shape[1], screenshot.shape[0]))
@@ -232,6 +242,12 @@ class Validator:
     
     def _save_comparison(self, name, current, template, score):
         """Save visual comparison image."""
+        # Convert BGRA to BGR if needed
+        if current.shape[2] == 4:
+            current = cv2.cvtColor(current, cv2.COLOR_BGRA2BGR)
+        if template.shape[2] == 4:
+            template = cv2.cvtColor(template, cv2.COLOR_BGRA2BGR)
+        
         # Create side-by-side comparison
         h, w = current.shape[:2]
         comparison = np.zeros((h, w * 2 + 10, 3), dtype=np.uint8)
