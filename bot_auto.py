@@ -70,7 +70,7 @@ class RuneLiteFixedDetector:
             screenshot = np.array(self.sct.grab(monitor))
             
             # Convert to grayscale
-            gray = cv2.cvtColor(screenshot, cv2.COLOR_BGRA2GRAY)
+            gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
             
             # Look for the characteristic OSRS interface
             # The game has a black border and specific UI colors
@@ -182,8 +182,8 @@ class RuneLiteFixedDetector:
         
         screenshot = np.array(self.sct.grab(viewport))
         
-        # Convert to HSV for better color detection
-        hsv = cv2.cvtColor(screenshot, cv2.COLOR_BGRA2HSV)
+        # Convert BGR to HSV for better color detection
+        hsv = cv2.cvtColor(screenshot, cv2.COLOR_BGR2HSV)
         
         # Varrock East bank booths are brown
         lower_brown = np.array([5, 50, 50])
