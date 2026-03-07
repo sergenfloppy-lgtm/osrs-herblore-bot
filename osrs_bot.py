@@ -305,8 +305,9 @@ class RecordingSetup:
         print("="*60)
         print("Showing click variance zones...")
         
-        for name, (x, y) in self.positions.items():
+        for name, value in self.positions.items():
             if name != 'inventory_slots':
+                x, y = value
                 self.overlay.add_zone(x, y, variance=15, label=name)
         
         self.overlay.show(duration=5)
