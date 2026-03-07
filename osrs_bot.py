@@ -259,6 +259,16 @@ class RecordingSetup:
                 'instruction': '📦 Close bank, then click the first inventory slot (top-left).',
                 'captured': False
             },
+            {
+                'name': 'herb_inv',
+                'instruction': f"🌿 [POTION MAKING] Withdraw 14 {self.potion_data['herb']} + 14 {self.potion_data['secondary']}, then click the HERB in your inventory (where it appears).",
+                'captured': False
+            },
+            {
+                'name': 'secondary_inv',
+                'instruction': f"🧪 [POTION MAKING] Now click the {self.potion_data['secondary']} in your inventory (where it appears).",
+                'captured': False
+            },
         ]
         
         print("\n" + "="*60)
@@ -332,13 +342,14 @@ class RecordingSetup:
             'version': 4,
             'created': datetime.now().isoformat(),
             'potion': self.potion_data,
-            'positions': {k: v for k, v in self.positions.items() if k != 'inventory_slots'},
-            'inventory_slots': self.positions['inventory_slots'],
+            'positions': self.positions,  # Save ALL positions including inventory_slots
             'variance': 15,
             'notes': {
                 'herb': f"Shift+Click to withdraw {self.potion_data['herb']}",
                 'secondary': f"Shift+Click to withdraw {self.potion_data['secondary']}",
-                'inventory': "28 slots calculated (4 cols × 7 rows)",
+                'herb_inv': f"Click {self.potion_data['herb']} in inventory",
+                'secondary_inv': f"Click {self.potion_data['secondary']} in inventory",
+                'inventory': "28 slots calculated (4 cols × 7 rows) + recorded herb/secondary positions",
                 'variance': "±15 pixels per click"
             }
         }
@@ -777,17 +788,24 @@ class Bot:
         print("   📝 Step 5: Wait for potions to finish")
         
         for attempt in range(self.max_retries):
-            slots = self.setup['positions']['inventory_slots']
+            # Use recorded positions for herb and secondary in inventory
+            herb_pos = self.setup['positions'].get('herb_inv')
+            secondary_pos = self.setup['positions'].get('secondary_inv')
             
-            # Herb (slot 0)
-            print(f"\n  Step 1: Clicking herb... (attempt {attempt + 1}/{self.max_retries})")
-            x, y = slots[0]
+            if not herb_pos or not secondary_pos:
+                print("  ⚠️  Missing recorded positions for inventory items!")
+                print("  ⚠️  Please run setup again and record herb_inv + secondary_inv")
+                return False
+            
+            # Herb in inventory
+            print(f"\n  Step 1: Clicking {self.setup['config']['potion']['herb']} in inventory... (attempt {attempt + 1}/{self.max_retries})")
+            x, y = herb_pos
             Movement.move_click(x, y)
             Movement.delay(0.4, 0.1)
             
-            # Secondary (slot 14)
-            print(f"  Step 2: Clicking {self.setup['config']['potion']['secondary']}...")
-            x, y = slots[14]
+            # Secondary in inventory
+            print(f"  Step 2: Clicking {self.setup['config']['potion']['secondary']} in inventory...")
+            x, y = secondary_pos
             Movement.move_click(x, y)
             Movement.delay(1.5, 0.3)  # Wait longer for dialogue
             
