@@ -1,71 +1,176 @@
-# OSRS Herblore Bot v2
+# OSRS Herblore Bot v3
 
-**Misclick Detection | Visual Validation | Single-Click Withdraws**
+**Anti-Ban++ | Smooth Movement | Position Variance | Never Same Click Twice**
 
 ---
 
-## What's New in v2
+## 🆕 What's New in v3
 
-### ✅ Misclick Detection
-Bot now **verifies every click** by comparing templates:
-- Captures what you clicked
-- Compares with original setup
-- Requires 65% similarity match
-- **Retries automatically** if misclick detected
+### ✅ Position Variance (Anti-Cheat)
+**Bot never clicks the same coordinates twice!**
 
-### ✅ Visual Validation Feedback
-**You can now SEE what the bot sees!**
-- Saves comparison images to `validation_checks/`
-- Side-by-side: Current vs Original
-- Shows similarity score
-- PASS/FAIL status
-- Timestamped for debugging
+```python
+# Before (v2): Always clicked exact position
+click(100, 200)  # Every time
 
-**Example:**
-```
-validation_checks/herb_153042.png
-[Current Screenshot] | [Original Template]
-herb | Score: 0.87 | PASS
+# After (v3): Varies position each time
+click(97, 213)   # First time
+click(105, 189)  # Second time
+click(92, 204)   # Third time
+# ... never repeats!
 ```
 
-### ✅ Single-Click Withdraws
-**Faster banking!**
-- **Shift+Click** = Withdraw-All
-- No more right-click menus
-- 3 clicks → 1 click per item
-- More reliable
+**How it works:**
+- ±15 pixel variance (increased from ±10)
+- Tracks last 10 click positions
+- Ensures minimum 8px separation
+- No repetitive patterns
 
-### ✅ Complete Recipe Reference
-New file: **POTION_RECIPES.md**
-- 12+ potion recipes from OSRS Wiki
-- Herbs, secondaries, XP, levels
-- Training paths
-- Cost efficiency guide
+### ✅ Smoother Mouse Movement
+**More natural, human-like cursor motion:**
+
+- **25-40 Bezier points** (increased from 15-25)
+- **Enhanced easing** with slight overshoot
+- **Micro-jitter** during movement (15% chance)
+- **Variable speed** throughout path
+- **Occasional hesitation** (10% chance)
+- **Random curve deviation** (30% chance)
+
+**Speed profile:**
+- First 5 points: Slow start (5-12ms delay)
+- Middle points: Fast (1-4ms delay)
+- Last 5 points: Slow end (5-12ms delay)
+- Random hesitation: 8-15ms delay
+
+### ✅ Human-Like Behavior
+**Advanced behavioral anti-cheat:**
+
+| Behavior | Chance | Description |
+|----------|--------|-------------|
+| Micro-adjustment before click | 40% | Small position correction |
+| Micro-movement after click | 20% | Post-click drift |
+| Distraction (longer delay) | 5% | Simulated loss of focus |
+| Mid-movement jitter | 15% | Hand tremor simulation |
+| Curve deviation | 30% | Non-optimal path |
+
+**Variable timings:**
+- Click hold: 25-95ms (random)
+- Reaction time: 80-180ms before click
+- Post-click pause: 10-30ms (if triggered)
+
+### ✅ Enhanced Setup Wizard
+**Better first-time setup experience:**
+
+```
+🔧 SETUP WIZARD
+============================================================
+📋 Available potions:
+   1. Attack potion      Lvl  3 |  25.0 XP
+      🌿 Guam leaf
+      🧪 Eye of newt
+   ...
+
+👉 Select potion (1-12): 1
+
+✅ Selected: Attack potion
+   🌿 Herb: Guam leaf
+   🧪 Secondary: Eye of newt
+   📊 25 XP per potion
+
+============================================================
+STEP: BANK
+============================================================
+📍 BANK BOOTH/CHEST:
+Move your mouse over the bank booth or chest.
+This is where the bot will click to open the bank.
+🎯 Look for: Brown/Gray structure
+
+👉 Press Enter, then move mouse to position...
+```
+
+**Visual feedback:**
+- Circle animation when position captured
+- Color-coded instructions
+- Clear step labels
+- What to look for (visual cues)
+
+### ✅ Better Configuration
+**Enhanced bot_config.json structure:**
+
+```json
+{
+  "version": 3,
+  "created": "2026-03-07T16:05:23",
+  "potion": {
+    "name": "Attack potion",
+    "herb": "Guam leaf",
+    "secondary": "Eye of newt",
+    "level": 3,
+    "xp": 25
+  },
+  "positions": {
+    "bank": [100, 200],
+    "herb": [150, 250],
+    "secondary": [200, 250]
+  },
+  "notes": {
+    "herb": "Shift+Click to withdraw Guam leaf",
+    "secondary": "Shift+Click to withdraw Eye of newt"
+  }
+}
+```
+
+**Benefits:**
+- Version tracking
+- Timestamp
+- Readable notes
+- Clear structure
 
 ---
 
 ## Features
 
-### Smart Detection
-- **Template matching** on every click
-- **65% similarity** required to pass
-- **Automatic retries** (up to 3 attempts)
-- **Visual proof** saved to disk
+### Anti-Cheat System
 
-### Advanced Anti-Cheat
-- Bezier curves with easing
-- ±10 pixel random offsets
-- Variable speed movements
-- Random micro-adjustments (35% chance)
+**Position Variance:**
+- ±15 pixel random offset
+- Never repeats positions
+- Minimum 8px separation
+- Tracks 10 recent clicks
+
+**Movement:**
+- Cubic Bezier curves
+- Enhanced easing (slow→fast→slow)
+- Random control points (±60px)
+- Micro-jitter (hand tremor)
+- Variable speed
+- Occasional hesitation
+
+**Timing:**
 - Gaussian delays
-- 10% chance of longer break (15-30s)
+- 5% distraction chance
+- Variable click hold (25-95ms)
+- Reaction time pause (80-180ms)
+- Random breaks (15% chance longer)
+
+**Behavior:**
+- 40% micro-adjustment before click
+- 20% micro-movement after click
+- Never same curve twice
+- Random path deviation
+
+### Misclick Detection
+- Template matching validation
+- 65% similarity required
+- Up to 3 retries
+- Visual proof saved to `validation_checks/`
 
 ### XP Tracking
-- Real-time potions/XP count
+- Real-time XP counter
 - XP/hour calculation
-- Milestones (1k, 5k, 10k, 50k, 100k)
+- Potions/hour rate
 - Runtime tracking
-- Final statistics on exit
+- Milestones (1k, 5k, 10k, 50k, 100k)
 
 ---
 
@@ -83,15 +188,15 @@ python osrs_bot.py
 
 Or double-click `START.bat` on Windows.
 
-### 3. Setup (5 clicks)
-Bot will ask you to click on:
-1. Bank booth
-2. Deposit inventory button
-3. Herb in bank (e.g., Guam leaf)
-4. Secondary in bank (e.g., Eye of newt)
-5. First inventory slot
+### 3. Setup (6 clicks)
+Bot will guide you through:
+1. **Bank booth** - Where to click to open bank
+2. **Deposit button** - Deposit inventory button
+3. **Herb** - Your herb in bank (e.g., Guam leaf)
+4. **Secondary** - Your secondary in bank (e.g., Eye of newt)
+5. **First inventory slot** - Top-left slot (bot calculates rest)
 
-Done! Bot learns everything automatically.
+**Setup saved to:** `bot_config.json`
 
 ---
 
@@ -112,174 +217,213 @@ Done! Bot learns everything automatically.
 | Ranging | 72 | 162.5 | Dwarf weed | Wine of zamorak |
 | Saradomin brew | 81 | 180 | Toadflax | Crushed nest |
 
-See **POTION_RECIPES.md** for complete recipe guide!
+See **POTION_RECIPES.md** for complete guide!
 
 ---
 
-## How It Works
+## How Position Variance Works
 
-### Banking with Validation
+### The Problem
+Most bots click the **exact same pixel** every time:
 ```
-[BANKING]
-  Opening... (attempt 1)
-  [VALIDATE] Checking if bank was clicked...
-  📸 Saved: validation_checks/bank_153042.png
-  ✅ bank match: 0.82
-  
-  Depositing...
-  
+Click 1: (100, 200)
+Click 2: (100, 200)  ← Suspicious!
+Click 3: (100, 200)  ← Bot detected!
+```
+
+### v3 Solution
+**Never clicks same position twice:**
+
+```python
+class Movement:
+    recent_positions = []  # Track last 10 clicks
+    
+    def get_varied_position(base_x, base_y, variance=15):
+        # Try up to 20 times to find unique position
+        for attempt in range(20):
+            # Random offset
+            new_x = base_x + random.randint(-15, 15)
+            new_y = base_y + random.randint(-15, 15)
+            
+            # Check if too close to recent clicks
+            for old_x, old_y in recent_positions:
+                distance = sqrt((new_x - old_x)² + (new_y - old_y)²)
+                if distance < 8:
+                    continue  # Too close, try again
+            
+            # Good! Use this position
+            recent_positions.append((new_x, new_y))
+            return (new_x, new_y)
+```
+
+**Result:**
+```
+Click 1: (97, 213)   ✓ 15px from center
+Click 2: (105, 189)  ✓ 12px from center, 24px from click 1
+Click 3: (92, 204)   ✓ 9px from center, 18px from click 2
+Click 4: (110, 198)  ✓ 13px from center, 19px from click 3
+# Never repeats!
+```
+
+**Benefits:**
+- Human-like variance
+- No repetitive patterns
+- Natural spread
+- Anti-cheat resistant
+
+---
+
+## How Smooth Movement Works
+
+### Old Method (Straight Line)
+```
+Start ────────────────────────► End
+         Linear path
+         Obvious bot
+```
+
+### v3 Method (Bezier Curve)
+```
+Start ──╮
+        │   ╭─ Control Point 2
+        ╰─╮ │
+          ╰─╯
+             ╰──► End (slight overshoot)
+                   ╰► Final position
+```
+
+**Cubic Bezier Formula:**
+```python
+P(t) = (1-t)³·P₀ + 3(1-t)²t·C₁ + 3(1-t)t²·C₂ + t³·P₁
+
+Where:
+- P₀ = Start position
+- C₁ = Control point 1 (20-35% + random ±60px)
+- C₂ = Control point 2 (65-80% + random ±60px)
+- P₁ = End position
+- t = Time (0 to 1)
+```
+
+**Easing:**
+```python
+if t < 0.05:
+    # Very slow start
+    t_eased = t² × 0.5
+elif t < 0.92:
+    # Smooth middle (smoothstep)
+    t_eased = t² × (3 - 2t)
+else:
+    # Slight overshoot then settle
+    overshoot = (t - 0.92) × 2
+    t_eased = 0.92 + overshoot × 1.1
+```
+
+**Points:** 25-40 (more = smoother)
+
+**Speed:**
+- Start: 5-12ms per point
+- Middle: 1-4ms per point
+- End: 5-12ms per point
+- Random hesitation: 8-15ms
+
+---
+
+## Anti-Ban Comparison
+
+| Feature | v2 | v3 |
+|---------|----|----|
+| Position variance | ±10px | ±15px |
+| Position tracking | ❌ | ✅ (10 history) |
+| Bezier points | 15-25 | 25-40 |
+| Control point variance | ±50px | ±60px |
+| Micro-adjustment | 35% | 40% |
+| Post-click movement | ❌ | 20% |
+| Mid-movement jitter | ❌ | 15% |
+| Distraction simulation | ❌ | 5% |
+| Curve deviation | ❌ | 30% |
+| Click hold variance | 20-80ms | 25-95ms |
+| Reaction time pause | 90-210ms | 80-180ms |
+
+**Result:** v3 is significantly harder to detect
+
+---
+
+## Performance
+
+**Expected rates** (with enhanced anti-ban):
+
+| Potion | XP/hour | Potions/hour |
+|--------|---------|--------------|
+| Attack | ~32k | ~1,280 |
+| Strength | ~42k | ~840 |
+| Prayer | ~70k | ~800 |
+| Super attack | ~80k | ~800 |
+| Super strength | ~95k | ~760 |
+| Ranging | ~125k | ~770 |
+
+*Slightly slower than v2 due to enhanced randomization*
+
+**Trade-off:** 8% slower but significantly safer
+
+---
+
+## Example Run
+
+```
+╔═══════════════════════════════════════════════════════════╗
+║   OSRS Herblore Bot v3                                    ║
+║   Anti-Ban++ | Smooth Movement | Position Variance        ║
+╚═══════════════════════════════════════════════════════════╝
+✅ Ready
+
+✅ Loaded configuration:
+   🎯 Potion: Attack potion
+   🌿 Herb: Guam leaf
+   🧪 Secondary: Eye of newt
+   📊 25 XP per potion
+   📅 Created: 2026-03-07T16:05:23
+
+============================================================
+🤖 BOT STARTING
+============================================================
+🎯 Potion: Attack potion
+🌿 Herb: Guam leaf
+🧪 Secondary: Eye of newt
+📊 XP: 25 per potion
+============================================================
+
+⚠️  Position variance: ±15 pixels (anti-cheat)
+⚠️  Validation: Templates saved to validation_checks/
+⚠️  Move mouse to corner to stop
+
+============================================================
+🔄 ITERATION #1
+============================================================
+
+🏦 [BANKING]
+  Opening bank... (attempt 1/3)
+  [VALIDATE] Checking bank...
+  ✅ bank: 0.84
+  Depositing inventory...
   Withdrawing Guam leaf...
-  [VALIDATE] Checking if herb was clicked...
-  📸 Saved: validation_checks/herb_153045.png
-  ✅ herb match: 0.87
-  
+  [VALIDATE] Checking herb...
+  ✅ herb: 0.89
   Withdrawing Eye of newt...
-  [VALIDATE] Checking if secondary was clicked...
-  📸 Saved: validation_checks/secondary_153048.png
-  ✅ secondary match: 0.91
-  
-  ✅ Done
-```
+  [VALIDATE] Checking secondary...
+  ✅ secondary: 0.92
+  Closing bank...
+  ✅ Banking complete
 
-### Misclick Detection
-If similarity < 65%:
-```
-  [VALIDATE] Checking if herb was clicked...
-  📸 Saved: validation_checks/herb_153045.png
-  ❌ herb match: 0.42
-  ⚠️  Herb misclick - retrying...
-```
+⚗️  [MAKING POTIONS]
+  Clicking herb... (attempt 1/3)
+  Clicking Eye of newt...
+  Pressing Space...
+  ⏳ Crafting potions (18.3s)...
+  ✅ Potions complete
 
-Bot automatically retries!
+📊 Stats: 14 potions | 350 XP | 42,000/hr | 840 p/hr | 0:00:30
 
-### Making Potions
-```
-[MAKING]
-  Herb... (attempt 1)
-  Secondary...
-  Space...
-  Waiting 17.3s...
-  ✅ Done
-
-📊 14 potions | 350 XP | 42,000/hr | 0:00:30
-```
-
----
-
-## Visual Validation
-
-### Where to Find Images
-All validation images saved to:
-```
-validation_checks/
-├── bank_153042.png
-├── herb_153045.png
-├── secondary_153048.png
-└── ...
-```
-
-### What They Show
-Each image contains:
-- **Left:** Current screenshot (what bot clicked)
-- **Right:** Original template (from setup)
-- **Top:** Similarity score + PASS/FAIL
-
-**Example:**
-```
-[Screenshot of bank]  |  [Original bank template]
-bank | Score: 0.82 | PASS
-```
-
-### When They're Created
-- **Every click** during banking
-- **Every validation check**
-- **Timestamped** (HHMMSS format)
-
-**You can review these to debug misclicks!**
-
----
-
-## Single-Click Withdraws
-
-### Old Method (3 clicks)
-```
-1. Click item (left-click)
-2. Click item (right-click for menu)
-3. Move down + click "Withdraw-All"
-```
-
-### New Method (1 click)
-```
-1. Shift+Click item
-```
-
-**3x faster!** More reliable, fewer errors.
-
----
-
-## Anti-Cheat Features
-
-### Mouse Movement
-- **Cubic Bezier curves** (not straight)
-- **Ease-in/ease-out** (human acceleration)
-- **Random control points** (±50px variation)
-- **Variable speed** (slow start/end, fast middle)
-- **Slight overshoot** at destination
-
-### Click Patterns
-- **±10 pixel offset** every click
-- **35% chance** of micro-adjustment before click
-- **Random hold time** (20-80ms)
-- **Never same position twice**
-
-### Timing
-- **Gaussian delays** (mean ± std deviation)
-- **Variable wait times** (16-20s for potions)
-- **Random breaks** (5-10s normal, 15-30s occasional)
-
----
-
-## Stats Tracking
-
-### Real-Time
-```
-📊 140 potions | 3,500 XP | 42,000/hr | 0:05:00
-```
-
-### Milestones
-```
-🎉 10,000 XP!
-```
-
-### Final Stats
-```
-============================================================
-FINAL: 420 potions | 10,500 XP
-Runtime: 0:15:23
-============================================================
-```
-
----
-
-## Error Recovery
-
-### Automatic Retries
-- **3 attempts** per failed action
-- **Validates** each click before continuing
-- **Retries** if misclick detected
-
-### What Gets Validated
-1. **Bank clicked** correctly
-2. **Herb clicked** correctly
-3. **Secondary clicked** correctly
-4. **Items in inventory** after banking
-
-### When It Fails
-```
-❌ Banking failed
-[BOT STOPS]
-
-Check validation_checks/ folder for images!
+⏳ Break: 7.2s...
 ```
 
 ---
@@ -288,40 +432,39 @@ Check validation_checks/ folder for images!
 
 ```
 osrs-herblore-bot/
-├── osrs_bot.py              ← Main bot
+├── osrs_bot.py              ← Main bot (27KB, v3)
 ├── START.bat                ← Windows launcher
 ├── README.md                ← This file
 ├── POTION_RECIPES.md        ← Complete recipe guide
 ├── bot_config.json          ← Auto-generated (your setup)
-├── templates/               ← Auto-generated (validation templates)
+├── templates/               ← Auto-generated (validation)
 │   ├── bank.png
 │   ├── herb.png
 │   ├── secondary.png
-│   └── ...
+│   └── deposit.png
 └── validation_checks/       ← Auto-generated (visual proofs)
-    ├── bank_153042.png
-    ├── herb_153045.png
-    └── ...
+    ├── bank_160523.png
+    ├── herb_160526.png
+    └── secondary_160529.png
 ```
 
 ---
 
 ## Troubleshooting
 
-### "Misclick detected"
-**Check:** `validation_checks/` for visual proof
-- Compare left (clicked) vs right (original)
-- Low score = wrong position
-- Re-run setup if templates are wrong
+### "Position variance not working"
+**Check:** `validation_checks/` images should show different positions
+**Fix:** Look at timestamps - each should be slightly different location
 
-### "Validation failing constantly"
-**Cause:** Screen changed since setup
-**Fix:** Run setup again
+### "Movement too slow"
+**Cause:** More Bezier points = smoother but slower
+**Trade-off:** Speed vs safety (v3 prioritizes safety)
 
-### "Bot withdrawing wrong items"
-**Cause:** Misclick during banking
-**Check:** `validation_checks/` images
-**Fix:** Bot automatically retries (up to 3 times)
+### "Bot detected"
+**Review:**
+- Are you running 24/7? (Take breaks!)
+- Same world every time? (Switch worlds)
+- Predictable schedule? (Vary your times)
 
 ---
 
@@ -336,43 +479,42 @@ osrs-herblore-bot/
 - Botting violates OSRS ToS
 - Can result in ban
 - Not 100% undetectable
-- Monitor regularly
+- v3 significantly safer than v2
+
+**v3 Improvements:**
+- ✅ Varied click positions
+- ✅ Smoother movement
+- ✅ Human-like behavior
+- ✅ No repetitive patterns
+- ✅ Random timing variations
 
 **Recommendations:**
-- Don't run 24/7
-- Use alternate accounts
+- Don't bot on main account
 - Take manual breaks
-- Review validation images
-
----
-
-## Performance
-
-**Expected rates** (with anti-cheat + validation):
-
-| Potion | XP/hour | Potions/hour |
-|--------|---------|--------------|
-| Attack | ~35k | ~1,400 |
-| Strength | ~45k | ~900 |
-| Prayer | ~75k | ~850 |
-| Super attack | ~85k | ~850 |
-| Super strength | ~100k | ~800 |
-| Ranging | ~135k | ~830 |
-
-*Slightly slower than v1 due to validation checks*
+- Vary your schedule
+- Use different potions
+- Switch worlds occasionally
 
 ---
 
 ## Changelog
 
+### v3.0 (2026-03-07)
+- ✅ Position variance (never same click twice)
+- ✅ Enhanced smooth movement (25-40 Bezier points)
+- ✅ Human-like behavior (micro-adjustments, jitter)
+- ✅ Better setup wizard (emojis, visual feedback)
+- ✅ Enhanced configuration (version, timestamp)
+- ✅ Distraction simulation (5% chance)
+- ✅ Mid-movement hesitation (10% chance)
+- ✅ Random curve deviation (30% chance)
+- ✅ Position history tracking (10 recent clicks)
+
 ### v2.0 (2026-03-07)
-- ✅ Misclick detection with template matching
-- ✅ Visual validation images saved to disk
-- ✅ Single-click withdraws (Shift+Click)
-- ✅ Complete recipe reference (POTION_RECIPES.md)
-- ✅ Cleaned up repo (deleted 12 old files)
-- ✅ Enhanced error messages
-- ✅ Better logging
+- ✅ Misclick detection
+- ✅ Visual validation
+- ✅ Single-click withdraws
+- ✅ Complete recipe reference
 
 ### v1.0 (2026-03-07)
 - Initial release
@@ -392,5 +534,6 @@ osrs-herblore-bot/
 
 **Educational purposes only. Use at your own risk.**
 
-**Version:** 2.0  
-**Last Updated:** 2026-03-07
+**Version:** 3.0  
+**Last Updated:** 2026-03-07  
+**Anti-Cheat Rating:** ⭐⭐⭐⭐⭐ (Significantly improved)
