@@ -62,7 +62,6 @@ class VisualOverlay:
     def __init__(self):
         self.overlay_window = None
         self.zones = []
-        self.sct = mss.mss()
     
     def add_zone(self, x, y, variance=15, label=""):
         """Add a click zone to display."""
@@ -78,8 +77,9 @@ class VisualOverlay:
         print(f"📍 Showing overlay for {duration}s...")
         
         # Capture screen
-        monitor = self.sct.monitors[1]  # Primary monitor
-        screenshot = np.array(self.sct.grab(monitor))
+        with mss.mss() as sct:
+            monitor = sct.monitors[1]  # Primary monitor
+            screenshot = np.array(sct.grab(monitor))
         
         # Convert to PIL
         img = Image.fromarray(cv2.cvtColor(screenshot, cv2.COLOR_BGRA2RGB))
@@ -134,7 +134,6 @@ class RecordingSetup:
     def __init__(self):
         self.positions = {}
         self.templates = {}
-        self.sct = mss.mss()
         self.potion_data = None
         self.recording = False
         self.current_step = None
@@ -150,22 +149,23 @@ class RecordingSetup:
             # Capture this position
             print(f"  📍 Captured: {self.current_step['name']} at ({x}, {y})")
             
-            # Screenshot around click
-            region = {'left': x - 35, 'top': y - 35, 'width': 70, 'height': 70}
-            screenshot = np.array(self.sct.grab(region))
+            # Screenshot around click (create new mss instance for thread safety)
+            with mss.mss() as sct:
+                region = {'left': x - 35, 'top': y - 35, 'width': 70, 'height': 70}
+                screenshot = np.array(sct.grab(region))
+                
+                if screenshot.shape[2] == 4:
+                    screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGRA2BGR)
+                
+                self.templates[self.current_step['name']] = screenshot
+                self.positions[self.current_step['name']] = (x, y)
+                
+                # Save template
+                Path('templates').mkdir(exist_ok=True)
+                img = Image.fromarray(cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB))
+                img.save(f"templates/{self.current_step['name']}.png")
             
-            if screenshot.shape[2] == 4:
-                screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGRA2BGR)
-            
-            self.templates[self.current_step['name']] = screenshot
-            self.positions[self.current_step['name']] = (x, y)
-            
-            # Save template
-            Path('templates').mkdir(exist_ok=True)
-            img = Image.fromarray(cv2.cvtColor(screenshot, cv2.COLOR_BGR2RGB))
-            img.save(f"templates/{self.current_step['name']}.png")
-            
-            # Move to next step
+            # Move to next step (outside with block)
             self.current_step['captured'] = True
             self._advance_step()
     
@@ -351,7 +351,6 @@ class Validator:
     
     def __init__(self, setup):
         self.setup = setup
-        self.sct = mss.mss()
         Path('validation_checks').mkdir(exist_ok=True)
         self.dialogue_template = None
     
@@ -365,8 +364,9 @@ class Validator:
         
         # Capture area around click
         x, y = click_pos
-        region = {'left': x - 35, 'top': y - 35, 'width': 70, 'height': 70}
-        screenshot = np.array(self.sct.grab(region))
+        with mss.mss() as sct:
+            region = {'left': x - 35, 'top': y - 35, 'width': 70, 'height': 70}
+            screenshot = np.array(sct.grab(region))
         
         if screenshot.shape[2] == 4:
             screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGRA2BGR)
@@ -406,19 +406,20 @@ class Validator:
         print(f"  [VALIDATE] Checking for {dialogue_name} dialogue...")
         
         # Capture center of screen (where dialogues appear)
-        monitor = self.sct.monitors[1]
-        center_x = monitor['width'] // 2
-        center_y = monitor['height'] // 2
-        
-        # Capture 400x300 region in center
-        region = {
-            'left': center_x - 200,
-            'top': center_y - 150,
-            'width': 400,
-            'height': 300
-        }
-        
-        screenshot = np.array(self.sct.grab(region))
+        with mss.mss() as sct:
+            monitor = sct.monitors[1]
+            center_x = monitor['width'] // 2
+            center_y = monitor['height'] // 2
+            
+            # Capture 400x300 region in center
+            region = {
+                'left': center_x - 200,
+                'top': center_y - 150,
+                'width': 400,
+                'height': 300
+            }
+            
+            screenshot = np.array(sct.grab(region))
         
         if screenshot.shape[2] == 4:
             screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGRA2BGR)
