@@ -1,275 +1,230 @@
-## OSRS Herblore Bot
+# OSRS Herblore Bot - Production Release
 
-An advanced, educational bot for training Herblore in Old School RuneScape with anti-detection features.
-
-⚠️ **DISCLAIMER**: Botting violates Jagex's Terms of Service. This project is for **educational and research purposes only**. Use at your own risk. The authors are not responsible for any account bans.
-
-## Features
-
-### Core Functionality
-- ✅ **Automated Potion Making** - Supports 11 different potions (Attack → Saradomin brew)
-- ✅ **Bank Integration** - Auto-withdraw ingredients, deposit finished potions
-- ✅ **Progressive Training** - Automatically levels from low to high tier potions
-- ✅ **Smart Detection** - Computer vision for interface detection
-- ✅ **Statistics Tracking** - XP/hr, potions/hr, runtime
-
-### Anti-Detection (Anti-Ban)
-- ✅ **Humanized Mouse Movement** - Bezier curves with random control points
-- ✅ **Random Delays** - Gaussian distribution (50-300ms)
-- ✅ **Misclicks** - 5% chance to slightly miss target first
-- ✅ **Random Breaks** - Every 15-45 minutes, 1-3 minute breaks
-- ✅ **Session Limits** - Auto-logout after 4-6 hours
-- ✅ **Activity Variation** - Random camera movements, skill checks
-
-### Safety
-- Combat detection → instant logout
-- Player proximity detection
-- Random event handling (placeholder)
-- Graceful error handling
-
-## Tech Stack
-
-- **Python 3.12**
-- **OpenCV** - Computer vision / template matching
-- **mss** - Fast screen capture
-- **PyAutoGUI** - Mouse/keyboard control
-- **Pytesseract** - OCR (optional, for text reading)
-- **NumPy / SciPy** - Mathematical operations
-
-## Installation
-
-### Prerequisites
-- Python 3.11+
-- Old School RuneScape (obviously)
-- Tesseract OCR (optional, for advanced features)
-
-### Setup
-
-```bash
-# Clone the repo
-git clone https://github.com/sergenfloppy-lgtm/osrs-herblore-bot.git
-cd osrs-herblore-bot
-
-# Install dependencies
-pip install -r requirements.txt
-
-# (Optional) Install Tesseract for OCR
-# Ubuntu/Debian: sudo apt-get install tesseract-ocr
-# macOS: brew install tesseract
-# Windows: Download from https://github.com/UB-Mannheim/tesseract/wiki
-```
-
-## Usage
-
-### Quick Start
-
-```bash
-python main.py
-```
-
-The bot will run an interactive setup wizard:
-1. Define your OSRS game window region (move mouse to corners)
-2. Select which potion to make
-3. Press Enter to start
-
-### List Available Potions
-
-```bash
-python main.py --list
-```
-
-### Requirements Before Starting
-
-1. **Be logged into OSRS**
-2. **Stand next to a bank** (or bank chest)
-3. **Bank contains:**
-   - Grimy or clean herbs (14+)
-   - Vials of water (14+)
-4. **Fixed or resizable classic mode** (not resizable modern)
-
-### Example Session
-
-```
-[BOT] Starting Herblore bot for Prayer potion
-[BOT] Required: Ranarr weed + Snape grass
-[BOT] Banking...
-[BOT] Withdrawing Ranarr weed...
-[BOT] Withdrawing vials of water...
-[BOT] Making potions...
-[BOT] Make-X interface detected
-[BOT] Waiting 35s for completion...
-
-==================================================
-[STATS] Runtime: 5m 23s
-[STATS] Potions made: 56
-[STATS] XP gained: 4,900
-[STATS] XP/hr: 54,600
-[STATS] Potions/hr: 624.0
-[ANTIBAN] Actions: 12
-[ANTIBAN] Next break: 847s
-==================================================
-```
-
-## Project Structure
-
-```
-osrs-herblore-bot/
-├── src/
-│   ├── bot/
-│   │   ├── herblore.py      # Main bot logic
-│   │   ├── banking.py       # Bank interactions
-│   │   ├── detection.py     # Computer vision
-│   │   └── antiban.py       # Anti-detection
-│   ├── utils/
-│   │   ├── mouse.py         # Humanized movements
-│   │   ├── keyboard.py
-│   │   └── screen.py        # Screen capture
-│   └── config.py            # Configuration
-├── data/
-│   ├── templates/           # UI element images (for template matching)
-│   └── potions.json         # Potion data (herbs, secondaries, XP, levels)
-├── main.py                  # Entry point
-├── requirements.txt
-└── README.md
-```
-
-## Supported Potions
-
-| Potion | Level | Herb | Secondary | XP |
-|--------|-------|------|-----------|-----|
-| Attack potion | 3 | Guam leaf | Eye of newt | 25 |
-| Antipoison | 5 | Marrentill | Unicorn horn dust | 37.5 |
-| Strength potion | 12 | Tarromin | Limpwurt root | 50 |
-| Restore potion | 22 | Harralander | Red spiders' eggs | 62.5 |
-| Prayer potion | 38 | Ranarr weed | Snape grass | 87.5 |
-| Super attack | 45 | Irit leaf | Eye of newt | 100 |
-| Super strength | 55 | Kwuarm | Limpwurt root | 125 |
-| Super restore | 63 | Snapdragon | Red spiders' eggs | 142.5 |
-| Super defence | 66 | Cadantine | White berries | 150 |
-| Ranging potion | 72 | Dwarf weed | Wine of zamorak | 162.5 |
-| Saradomin brew | 81 | Toadflax | Crushed nest | 180 |
-
-## How It Works
-
-### 1. Computer Vision Pipeline
-- **Screen Capture**: Fast screenshot using `mss` library
-- **Template Matching**: OpenCV compares game elements to pre-saved templates
-- **Color Detection**: HSV color space for detecting bank interface, inventory slots
-- **OCR**: Pytesseract reads text (for future enhancements)
-
-### 2. State Machine
-The bot operates as a finite state machine:
-
-```
-IDLE → CHECK_INVENTORY → 
-  ↓ (empty)         ↓ (has items)
-BANKING         MAKE_POTIONS
-  ↓                   ↓
-WITHDRAW_ITEMS → (loop back)
-```
-
-### 3. Anti-Detection
-- **Mouse Movement**: Bezier curves with 2-3 random control points
-- **Delays**: Gaussian distribution (μ=150ms, σ=50ms)
-- **Misclicks**: 5% chance to click slightly off-target first
-- **Breaks**: Random intervals (15-45 min), duration (1-3 min)
-- **Session Limit**: 4-6 hours then auto-logout
-- **Random Activities**: Camera rotations, skill tab checks
-
-### 4. Banking Logic
-1. Detect bank interface (color matching)
-2. Deposit all finished potions
-3. Withdraw 14 herbs
-4. Withdraw 14 vials of water
-5. Close bank
-
-### 5. Potion Making
-1. Click herb in inventory
-2. Click vial of water
-3. Detect "Make-X" interface
-4. Press spacebar to start
-5. Wait for completion (~35 seconds for 14 potions)
-
-## Configuration
-
-Edit `src/config.py` to customize:
-
-```python
-# Anti-ban settings
-BREAK_FREQUENCY_MIN = 15  # minutes
-BREAK_FREQUENCY_MAX = 45
-BREAK_DURATION_MIN = 60   # seconds
-BREAK_DURATION_MAX = 180
-MAX_SESSION_HOURS = (4, 6)
-
-# Mouse settings
-MISCLICK_CHANCE = 0.05  # 5%
-
-# Action delays
-ACTION_DELAY_MEAN = 0.15  # seconds
-ACTION_DELAY_STD = 0.05
-```
-
-## Limitations & Future Improvements
-
-### Current Limitations
-- Only supports potion making (not cleaning herbs)
-- Requires manual positioning at bank
-- No GUI dashboard yet (CLI only)
-- Template images not included (users must capture their own)
-- Simplified detection (may not work in all scenarios)
-
-### Planned Features (v2.0)
-- [ ] PyQt6 GUI dashboard
-- [ ] Herb cleaning support
-- [ ] Grand Exchange integration
-- [ ] Multiple potion types in one session
-- [ ] Profit calculator
-- [ ] Better template matching with included templates
-- [ ] Multi-account support
-- [ ] Discord webhook notifications
-
-## Safety Tips
-
-1. **Don't bot on your main account** - Use a throwaway alt
-2. **Start with short sessions** - 30 min to 1 hour initially
-3. **Vary your botting times** - Don't bot same hours every day
-4. **Take manual breaks** - Play legitimately between bot sessions
-5. **Don't bot while AFK** - Monitor the bot occasionally
-6. **Use a VPN** (optional) - If paranoid about IP flagging
-
-## Troubleshooting
-
-**Bot can't find game window**
-- Make sure OSRS is visible on screen
-- Use fixed mode or resizable classic (not modern)
-- Re-run setup wizard to redefine region
-
-**Bank detection failing**
-- Stand directly next to banker/chest
-- Make sure camera angle shows the bank clearly
-- Check that game brightness isn't too dark/bright
-
-**Potion making stuck**
-- Ensure inventory has correct items
-- Check that "Make-X" interface is appearing
-- Try restarting the bot
-
-## Contributing
-
-PRs welcome! Areas for improvement:
-- Better template matching
-- More robust detection algorithms
-- GUI dashboard (PyQt6)
-- Additional potion types
-- Performance optimizations
-
-## License
-
-MIT License - See LICENSE file
+**Simple. Validated. Anti-Cheat.**
 
 ---
 
-**Remember**: This is an educational project. Botting is against OSRS rules and can result in permanent bans. Use responsibly (or not at all).
+## Features
 
-**Built by Sergenfloppy** | 2026-03-06
+### ✅ Direct Herb + Secondary Workflow
+- No vials of water needed
+- Herb + Secondary = Finished potion
+- Simplified process
+
+### ✅ Advanced Anti-Cheat
+- **Bezier curves** with ease-in/ease-out
+- **Random offsets**: ±10 pixels every click
+- **Variable speed**: Slow at start/end, fast in middle
+- **Micro-adjustments**: 35% chance before clicks
+- **Random control points**: ±50px variation
+- **Gaussian delays**: Natural timing variation
+- **Random breaks**: 10% chance of 15-30s break
+
+### ✅ State Validation
+- **Bank verification**: Checks bank actually opened
+- **Make-X validation**: Confirms interface appeared
+- **Inventory checks**: Verifies items withdrawn
+- **Template matching**: >60% similarity required
+
+### ✅ Error Recovery
+- **3 retries** per failed step
+- **Automatic rollback** on validation failures
+- **Smart retry logic**: Waits and tries again
+
+### ✅ XP Tracker
+- **Total XP** and **XP/hour**
+- **Potions made** and **potions/hour**
+- **Runtime tracking**
+- **Milestones**: 1k, 5k, 10k, 50k, 100k XP
+- **Final stats** on exit
+
+---
+
+## Setup (5 Minutes)
+
+### 1. Install Dependencies
+```bash
+pip install pyautogui mss opencv-python pillow numpy
+```
+
+### 2. Run Bot
+```bash
+python osrs_bot.py
+```
+
+Or double-click `START.bat` on Windows.
+
+### 3. Follow Setup
+Bot will ask you to click on 5 positions:
+1. Bank booth
+2. Deposit inventory button
+3. Herb in bank (e.g., Guam leaf)
+4. Secondary in bank (e.g., Eye of newt)
+5. First inventory slot
+
+Bot calculates everything else automatically!
+
+---
+
+## Supported Potions
+
+| Potion | Herb | Secondary | Level | XP |
+|--------|------|-----------|-------|-----|
+| Attack potion | Guam leaf | Eye of newt | 3 | 25 |
+| Strength potion | Tarromin | Limpwurt root | 12 | 50 |
+| Restore potion | Harralander | Red spiders' eggs | 22 | 62.5 |
+| Prayer potion | Ranarr weed | Snape grass | 38 | 87.5 |
+| Super attack | Irit leaf | Eye of newt | 45 | 100 |
+| Super strength | Kwuarm | Limpwurt root | 55 | 125 |
+| Super restore | Snapdragon | Red spiders' eggs | 63 | 142.5 |
+| Super defence | Cadantine | White berries | 66 | 150 |
+| Ranging potion | Dwarf weed | Wine of zamorak | 72 | 162.5 |
+
+---
+
+## How It Works
+
+### Banking
+1. Opens bank
+2. **Validates**: Bank interface appeared
+3. Deposits inventory
+4. Withdraws 14 herbs
+5. Withdraws 14 secondaries
+6. **Validates**: Inventory has items
+7. If validation fails: **Retry** (up to 3 times)
+
+### Making Potions
+1. Clicks herb in inventory
+2. Clicks secondary in inventory
+3. **Validates**: Make-X interface appeared
+4. Presses space to start
+5. Waits for completion
+6. If validation fails: **Retry**
+
+### Stats
+```
+📊 STATS:
+   Potions: 140
+   Total XP: 3,500
+   XP/hour: 42,000
+   Potions/hour: 168.0
+   Runtime: 0:05:00
+```
+
+---
+
+## Anti-Cheat Details
+
+### Mouse Movement
+- **Cubic Bezier curves** (not straight lines)
+- **Ease-in/ease-out** (human acceleration)
+- **Random control points** every movement
+- **Variable speed** along path
+- **Slight overshoot** at end (10% of movement)
+
+### Click Patterns
+- **±10 pixel offset** on EVERY click
+- **Micro-adjustments** before 35% of clicks
+- **Random hold time**: 20-80ms
+- **Never clicks exact same spot twice**
+
+### Timing
+- **Gaussian delays**: Mean ± variation
+- **Variable wait times**: 16-20s for potions
+- **Random breaks**: 5-10s normally, 15-30s occasionally
+- **No predictable patterns**
+
+---
+
+## Safety
+
+### Failsafe
+- Move mouse to **top-left corner** to stop instantly
+- Or press **Ctrl+C**
+
+### Detection Risk
+While this bot includes anti-cheat features:
+- ⚠️ **Use at your own risk**
+- ⚠️ **Botting violates OSRS ToS**
+- ⚠️ **Can result in ban**
+- ⚠️ **Not 100% undetectable**
+
+**Recommendations:**
+- Don't run 24/7
+- Use on alternate accounts
+- Monitor regularly
+- Take manual breaks
+
+---
+
+## Files
+
+```
+osrs-herblore-bot/
+├── osrs_bot.py          ← Main bot
+├── START.bat            ← Windows launcher
+├── bot_config.json      ← Your setup (auto-generated)
+├── templates/           ← Validation templates (auto-generated)
+│   ├── bank_interface.png
+│   ├── makex_interface.png
+│   └── [other positions].png
+└── README.md            ← This file
+```
+
+---
+
+## Troubleshooting
+
+### "Missing dependency"
+```bash
+pip install pyautogui mss opencv-python pillow numpy
+```
+
+### "Bank didn't open"
+- Make sure you clicked the right spot during setup
+- Try re-running setup
+- Stand closer to bank
+
+### "Make-X didn't appear"
+- Check inventory has both items
+- Herb must be in slot 1
+- Secondary must be in slot 15
+
+### "Inventory empty"
+- Check bank has items
+- Make sure you clicked correct positions
+- Try withdrawing manually first to test
+
+---
+
+## Performance
+
+**Expected rates** (with all anti-cheat features enabled):
+
+| Potion | XP/hour | Potions/hour |
+|--------|---------|--------------|
+| Attack | ~35k | ~1,400 |
+| Strength | ~45k | ~900 |
+| Prayer | ~75k | ~850 |
+| Super attack | ~85k | ~850 |
+| Super strength | ~100k | ~800 |
+
+*Actual rates vary based on delays and breaks*
+
+---
+
+## License
+
+Educational purposes only.
+
+Botting violates Old School RuneScape Terms of Service.
+
+Use at your own risk.
+
+---
+
+**GitHub**: https://github.com/sergenfloppy-lgtm/osrs-herblore-bot
+
+**Version**: 1.0 Production
+
+**Last Updated**: 2026-03-07
